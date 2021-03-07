@@ -10,7 +10,7 @@ async def connect_to_chat(host: str,
 
 
 async def run(host: str, port: int):
-    reader, writer = connect_to_chat(host, port)
+    reader, writer = await connect_to_chat(host, port)
 
     try:
         while True:
