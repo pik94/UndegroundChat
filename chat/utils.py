@@ -9,7 +9,6 @@ def set_logger_settings(level: Optional[int] = logging.INFO,
     handlers = {
         'console': {
             'class':        'logging.StreamHandler',
-            'level':        level,
             'formatter':    'console',
         },
     }
@@ -21,7 +20,6 @@ def set_logger_settings(level: Optional[int] = logging.INFO,
         log_file.parent.mkdir(exist_ok=True, parents=True)
         handlers['file'] = {
             'class':        'logging.handlers.RotatingFileHandler',
-            'level':        level,
             'formatter':    'detailed',
             'filename':     log_file,
             'mode':         'a',

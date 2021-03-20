@@ -1,6 +1,7 @@
 import argparse
+import logging
 from pathlib import Path
-from typing import NoReturn, Tuple
+from typing import NoReturn
 
 from chat import ChatReader
 
@@ -11,11 +12,19 @@ def main(args: argparse.Namespace) -> NoReturn:
     history = Path(args.history)
     log = args.log
     chat_reader = ChatReader(host, port, history, log)
-    chat_reader.run()
+    if args.debug:
+        chat_reader.run(logging.DEBUG)
+    else:
+        chat_reader.run()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--debug',
+                        required=False,
+                        action='store_true',
+                        default=False,
+                        help='Turn on a debug mode.')
     parser.add_argument('--host',
                         type=str,
                         required=False,

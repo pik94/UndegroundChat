@@ -29,7 +29,7 @@ class ChatReader(Chat):
         asyncio.run(self.read())
 
     async def read(self):
-        reader = await self.reader
+        reader, writer = await asyncio.open_connection(self.host, self.port)
 
         try:
             while True:
@@ -40,4 +40,4 @@ class ChatReader(Chat):
                     msg = f'[{date.strftime("%Y.%m.%d %H:%M")}] {data}'
                     await file.write(msg)
         finally:
-            await self._writer.close()
+            writer.close()

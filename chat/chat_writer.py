@@ -19,41 +19,53 @@ class ChatWriter(Chat):
 
         super().__init__(host, port, log_file)
 
-    def run(self,
-            message: str,
-            log_level: Optional[int] = logging.INFO):
+    def run(self, log_level: Optional[int] = logging.INFO):
         logger.setLevel(log_level)
-        asyncio.run(self.write(message))
+        logger.info('Type your messages:')
+        while True:
+            message = input()
+            logger.info(message)
+            asyncio.run(self.write(message))
 
     async def write(self, message: str):
-        reader = await self.reader
-        writer = await self.writer
+        reader, writer = await asyncio.open_connection(self.host, self.port)
 
         try:
             data = await reader.read(self.read_size)
             data = data.decode('utf-8')
             logger.debug(data)
+
             writer.write(f'{self.account_hash}\n'.encode())
 
             await asyncio.sleep(2)
+
             data = await reader.read(self.read_size)
             data = data.decode().split('\n')
             if len(data) == 3:
                 metadata = data[0]
-            else:
+                chat_welcome_msg = data[0]
+            elif len(data) > 3:
                 metadata = data[1]
-
-            if metadata == 'null':
+                chat_welcome_msg = data[1]
+            else:
+                logger.debug('Exit')
+                writer.close()
                 return
 
-            logger.info('Send your message to chat...')
+            logger.debug(chat_welcome_msg)
+            if metadata == 'null':
+                logger.debug('Input account hash is not valid.')
+                writer.close()
+                return
 
             if not message.endswith('\n'):
                 message = f'{message}\n'
 
+            logger.debug('Send your message to chat...')
             writer.write(f'{message}\n'.encode())
-            logger.info('Success!')
-        except:
-            logger.info('Something was wrong!')
+            logger.debug('Success!')
+        except Exception as e:
+            logger.debug('Something was wrong!')
+            logger.debug(e)
         finally:
             writer.close()

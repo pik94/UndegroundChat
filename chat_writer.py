@@ -1,4 +1,5 @@
 import argparse
+import logging
 from typing import NoReturn
 
 from chat import ChatWriter
@@ -10,15 +11,19 @@ def main(args: argparse.Namespace) -> NoReturn:
     account_hash = args.account_hash
     log = args.log
     chat_writer = ChatWriter(host, port, account_hash, log)
-    chat_writer.run(message=args.message)
+    if args.debug:
+        chat_writer.run(logging.DEBUG)
+    else:
+        chat_writer.run()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--message',
-                        type=str,
-                        required=True,
-                        help='A message to send to a chat')
+    parser.add_argument('--debug',
+                        required=False,
+                        action='store_true',
+                        default=False,
+                        help='Turn on a debug mode.')
     parser.add_argument('--host',
                         type=str,
                         required=False,
